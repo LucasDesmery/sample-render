@@ -31,7 +31,7 @@ def get_answer_by_id(aid):
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM Answer WHERE id = ?", (aid,))
+    cursor.execute("SELECT * FROM newAnswer WHERE id = ?", (aid,))
     row = cursor.fetchone()
 
     conn.close()
@@ -68,3 +68,4 @@ def daily_random():
         "Question": question,
         "Answer": answer
     }
+
