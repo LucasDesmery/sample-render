@@ -15,10 +15,6 @@ app.add_middleware(
 
 DB_PATH = "mibase.db"
 
-# Tus ranges reales de IDs
-MIN_ID = 2
-MAX_ID = 708
-
 
 def get_question_by_id(qid):
     conn = sqlite3.connect(DB_PATH)
@@ -56,8 +52,19 @@ def daily_random():
     today = str(date.today())  
     seed = abs(hash(today))
 
-    # Crear ID estable para el día
-    qid = (seed % (MAX_ID - MIN_ID + 1)) + MIN_ID
+    # Obtener todos los IDs válidos de la base de datos
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM Question ORDER BY id")
+    valid_ids = [row[0] for row in cursor.fetchall()]
+    conn.close()
+
+    if not valid_ids:
+        return {"error": "No hay preguntas disponibles en la base de datos"}
+
+    # Seleccionar un ID basado en el seed del día
+    index = seed % len(valid_ids)
+    qid = valid_ids[index]
 
     # Obtener la question
     question = get_question_by_id(qid)
